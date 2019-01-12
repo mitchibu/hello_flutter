@@ -80,7 +80,10 @@ class DatabaseHelper {
 
   Future<List<Account>> getAccount({int limit, int offset}) async {
     List<Account> accounts = [];
-    List<Map<String, dynamic>> data = await query(Account.table, limit: limit, offset: offset);
+    List<Map<String, dynamic>> data = await (await db).query(Account.table,
+      where: "deteled_at is null",
+      limit: limit,
+      offset: offset,);
     for(var record in data) {
       accounts.add(Account.fromMap(record));
     }

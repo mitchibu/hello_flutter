@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../db/model/account.dart';
 import '../detail/main.dart';
@@ -21,6 +22,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
 //  final List<Account> accounts = <Account>[];
 
   PagedListAdapter<Map<String, dynamic>> _data;
+  bool isVisible = true;
 
   @override
   void initState() {
@@ -72,12 +74,17 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
       drawer: SafeArea(
         child: Drawer(),
       ),
-      //drawer: Drawer(),
-      body: _buildBody(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){},
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      body: _buildBody(context),
+      floatingActionButton: Opacity(
+        opacity: isVisible ? 1.0 : 0.0,
+        child:
+          FloatingActionButton(
+            onPressed: () {
+              if(isVisible) _showDetail(Account(title: '', name: ''));
+            },
+            tooltip: 'Increment',
+            child: Icon(Icons.add),
+          ),
       ),
     );
   }
@@ -101,17 +108,43 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
   //     },
   //   );
   // }
-  Widget _buildBody() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0.0),
-      itemCount: _data.getCount(),
-      itemBuilder: (context, position) {
-        return _buildRow(Account.fromMap(_data.getAt(position)));
+  Widget _buildBody(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if(notification is UserScrollNotification) {
+          setState(() {
+            isVisible = notification.direction == ScrollDirection.idle;
+          });
+        }
       },
+      child:
+        ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0.0),
+          itemCount: _data.getCount(),
+          itemBuilder: (context, position) {
+            return _buildRow(context, Account.fromMap(_data.getAt(position)));
+          },
+        ),
     );
   }
 
-  Widget _buildRow(Account account) {
+  Widget _buildRow(BuildContext context, Account account) {
+    return Dismissible(
+      key: Key(account.name),
+      onDismissed: (direction) {
+        print('onDismissed');
+        final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      },
+      background: Container(
+        color: Colors.red,
+        child: Icon(Icons.delete),
+      ),
+      child: _buildListTile(account),
+    );
+  }
+
+  Widget _buildListTile(Account account) {
     return ListTile(
       title: Container(
         child: Column(
@@ -134,9 +167,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         //Navigator.push(context, CupertinoPageRoute(builder: (context) => DetailWidget(account: account)));
         //Navigator.push(context, SlideTransitionRoute(builder: (context) => DetailWidget(account: account)));
         //Navigator.of(context).push(SlideLeftRoute2(enterWidget: DetailWidget(account: account), exitWidget: widget));
-        print("before");
-        final result = await Navigator.of(context).push(PageTransition(type: PageTransitionType.rightToLeftWithFade, child: DetailWidget(account: account)));
-        print("after$result");
+        _showDetail(account);
         /*Navigator.of(context).push(PageRouteBuilder(
           opaque: false,
           transitionDuration: const Duration(milliseconds: 1000),
@@ -158,5 +189,11 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         ));*/
       },
     );
+  }
+
+  void _showDetail(Account account) async {
+    print("before");
+    final result = await Navigator.of(context).push(PageTransition(type: PageTransitionType.rightToLeftWithFade, child: DetailWidget(account: account)));
+    print("after$result");
   }
 }
