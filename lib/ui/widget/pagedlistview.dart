@@ -86,6 +86,10 @@ class PagedListAdapter<T> {
     return entries[index];
   }
 
+  void remove(int position) {
+    entries.removeAt(position);
+  }
+
   void reload() {
     entries.clear();
     _load(0, entries.length);

@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 
 const String _ID = 'id';
+const String _CATEGORY = 'category';
 const String _TITLE = 'title';
 const String _NAME = 'name';
 const String _CREATED_AT = 'created_at';
@@ -12,6 +13,7 @@ class Account {
   static final String sql =
     "create table $table ("
     "$_ID integer primary key autoincrement,"
+    "$_CATEGORY integer,"
     "$_TITLE text not null,"
     "$_NAME text not null,"
     "$_CREATED_AT integer not null,"
@@ -19,6 +21,7 @@ class Account {
     "$_DELETED_AT integer)";
 
   int id;
+  int category;
   String title;
   String name;
   int createdAt;
@@ -26,6 +29,7 @@ class Account {
   int deletedAt;
 
   Account({
+    this.category,
     @required this.title,
     @required this.name,
     this.createdAt,
@@ -36,13 +40,14 @@ class Account {
     updatedAt ??= DateTime.now().millisecond; 
   }
 
-  Account.fromMap(Map<String, dynamic> map) {
-    id = map[_ID];
-    title = map[_TITLE];
-    name = map[_NAME];
-    createdAt = map[_CREATED_AT];
-    updatedAt = map[_UPDATED_AT];
-    deletedAt = map[_DELETED_AT];
+  Account.fromMap(Map<String, dynamic> map, {String prefix = ''}) {
+    id = map["$prefix$_ID"];
+    category = map["$prefix$_CATEGORY"];
+    title = map["$prefix$_TITLE"];
+    name = map["$prefix$_NAME"];
+    createdAt = map["$prefix$_CREATED_AT"];
+    updatedAt = map["$prefix$_UPDATED_AT"];
+    deletedAt = map["$prefix$_DELETED_AT"];
   }
 
   Map<String, dynamic> toMap() {
@@ -50,8 +55,10 @@ class Account {
       _TITLE:title,
       _NAME:name,
       _CREATED_AT:createdAt,
-      _UPDATED_AT:updatedAt};
+      _UPDATED_AT:updatedAt
+    };
     if(id != null) map[_ID] = id;
+    if(category != null) map[_CATEGORY] = category;
     if(deletedAt != null) map[_DELETED_AT] = deletedAt;
     return map;
   }

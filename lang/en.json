@@ -1,3 +1,5 @@
 {
-	"app_name": "Hello Flutter"  
+	"app_name": "Hello Flutter",
+	"message_delete": "Deleted",
+	"undo": "Undo"
 }

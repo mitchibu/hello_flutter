@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../db/model/account.dart';
+import '../../db/model/account_view.dart';
 
 class DetailWidget extends StatefulWidget {
-  final Account account;
+  final AccountView account;
 
   DetailWidget({Key key, @required this.account}) : super(key: key);
 
@@ -12,8 +12,6 @@ class DetailWidget extends StatefulWidget {
 }
 
 class _DetailWidgetState extends State<DetailWidget> {
-  final List<Account> accounts = <Account>[];
-
   void _incrementCounter() {
     setState(() {
     });
@@ -42,11 +40,11 @@ class _DetailWidgetState extends State<DetailWidget> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              widget.account.title,
+              widget.account == null ? '' : widget.account.account.title,
               style: const TextStyle(fontSize: 18.0),
             ),
             Text(
-              widget.account.name,
+              widget.account == null ? '' : widget.account.account.name,
               style: const TextStyle(fontSize: 16.0),
             ),
           ],

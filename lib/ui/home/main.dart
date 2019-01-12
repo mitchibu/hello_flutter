@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hello_flutter/db/model/account_view.dart';
+import 'package:hello_flutter/localizations.dart';
 
 import '../../db/model/account.dart';
 import '../detail/main.dart';
@@ -21,19 +23,19 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
   final DatabaseHelper _db = DatabaseHelper();
 //  final List<Account> accounts = <Account>[];
 
-  PagedListAdapter<Map<String, dynamic>> _data;
+  PagedListAdapter<AccountView> _data;
   bool isVisible = true;
 
   @override
   void initState() {
     super.initState();
-    _data = PagedListAdapter<Map<String, dynamic>>(
+    _data = PagedListAdapter<AccountView>(
       callback: () {
         setState(() {
-          print(_data.getCount());
+//          print(_data.getCount());
         });
       },
-      pageFuture: (int startPosition, int pageSize) => _db.query('account', limit: pageSize, offset: startPosition),
+      pageFuture: (int startPosition, int pageSize) => _db.getAccountView(limit: pageSize, offset: startPosition),
       pageSize: 10,
     );
 //    WidgetsBinding.instance.addObserver(this);
@@ -80,7 +82,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         child:
           FloatingActionButton(
             onPressed: () {
-              if(isVisible) _showDetail(Account(title: '', name: ''));
+              if(isVisible) _showDetail(null);
             },
             tooltip: 'Increment',
             child: Icon(Icons.add),
@@ -122,19 +124,41 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
           padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0.0),
           itemCount: _data.getCount(),
           itemBuilder: (context, position) {
-            return _buildRow(context, Account.fromMap(_data.getAt(position)));
+            return _buildRow(context, _data.getAt(position), position);
           },
         ),
     );
   }
 
-  Widget _buildRow(BuildContext context, Account account) {
+  Widget _buildRow(BuildContext context, AccountView account, int position) {
     return Dismissible(
-      key: Key(account.name),
+      key: Key(account.account.name),
       onDismissed: (direction) {
-        print('onDismissed');
-        final snackBar = SnackBar(content: Text('Yay! A SnackBar!'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        setState(() {
+          _db.deleteAccount(account.account, isLogical: true);
+          _data.remove(position);
+        });
+        // _db.deleteAccount(account, isLogical: true);
+        final snackBar = SnackBar(
+          content: Text(MyLocalizations.of(context).$('message_delete')),
+          action: SnackBarAction(
+            label: MyLocalizations.of(context).$('undo'),
+            onPressed: () {
+              // Some code to undo the change!
+            },
+          ),
+        );
+        Scaffold.of(context).showSnackBar(snackBar).closed.then((reason) {
+          //_db.deleteAccount(account, isLogical: false).then((v) {
+            //_data.remove(position);
+            //_data.reload();
+          //});
+          // これで落ちる
+          // setState(() {});
+          // _db.deleteAccount(account, isLogical: false).then((v){
+          //   setState(() {});
+          // });
+        });
       },
       background: Container(
         color: Colors.red,
@@ -144,7 +168,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
     );
   }
 
-  Widget _buildListTile(Account account) {
+  Widget _buildListTile(AccountView account) {
     return ListTile(
       title: Container(
         child: Column(
@@ -152,11 +176,15 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              account.title,
+              account.category.name,
+              style: const TextStyle(fontSize: 14.0),
+            ),
+            Text(
+              account.account.title,
               style: const TextStyle(fontSize: 18.0),
             ),
             Text(
-              account.name,
+              account.account.name,
               style: const TextStyle(fontSize: 16.0),
             ),
           ],
@@ -191,7 +219,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
     );
   }
 
-  void _showDetail(Account account) async {
+  void _showDetail(AccountView account) async {
     print("before");
     final result = await Navigator.of(context).push(PageTransition(type: PageTransitionType.rightToLeftWithFade, child: DetailWidget(account: account)));
     print("after$result");
