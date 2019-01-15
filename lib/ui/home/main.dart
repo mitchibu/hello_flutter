@@ -22,7 +22,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
 //  final List<Account> accounts = <Account>[];
 
   PagedListAdapter<AccountView> _data;
-  bool isVisible = true;
+  bool _isVisible = true;
 
   @override
   void initState() {
@@ -75,12 +75,13 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         child: Drawer(),
       ),
       body: _buildBody(context),
-      floatingActionButton: Opacity(
-        opacity: isVisible ? 1.0 : 0.0,
+      floatingActionButton: AnimatedOpacity(
+        opacity: _isVisible ? 1.0 : 0.0,
+        duration: Duration(milliseconds: 300),
         child:
           FloatingActionButton(
             onPressed: () {
-              if(isVisible) _showDetail(null);
+              if(_isVisible) _showDetail(null);
             },
             tooltip: 'Increment',
             child: Icon(Icons.add),
@@ -113,7 +114,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
       onNotification: (notification) {
         if(notification is UserScrollNotification) {
           setState(() {
-            isVisible = notification.direction == ScrollDirection.idle;
+            _isVisible = notification.direction == ScrollDirection.idle;
           });
         }
       },
