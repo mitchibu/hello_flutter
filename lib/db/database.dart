@@ -1,9 +1,11 @@
+import 'package:hello_flutter/db/dao/account.dart';
+import 'package:hello_flutter/db/dao/account_view.dart';
+import 'package:hello_flutter/db/dao/category.dart';
+import 'package:hello_flutter/db/model/account.dart';
 import 'package:hello_flutter/db/model/account_view.dart';
 import 'package:hello_flutter/db/model/category.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'model/account.dart';
 
 class DatabaseHelper {
   static DatabaseHelper _singleton;
@@ -22,6 +24,9 @@ class DatabaseHelper {
 
   static Database _db;
 
+  final AccountDao accountDao = AccountDao();
+  final AccountViewDao accountViewDao = AccountViewDao();
+  final CategoryDao categoryDao = CategoryDao();
   final String _name;
   final int _version;
 
@@ -39,83 +44,47 @@ class DatabaseHelper {
   }
 
   void _onCreate(Database db, int version) async {
-    print(Account.sql);
-    await db.execute(Account.sql);
-    print(Category.sql);
-    await db.execute(Category.sql);
-    print(AccountView.sql);
-    await db.execute(AccountView.sql);
+    await db.execute(accountDao.createTableQuery);
+    await db.execute(categoryDao.createTableQuery);
+    await db.execute(accountViewDao.createTableQuery);
 
     // test data
     await db.transaction((t) async {
       var batch = t.batch();
       for(int i = 0; i < 100; ++ i) {
-        batch.insert(Account.table, Account(category: 1, title: "title$i", name: "name$i").toMap());
+        batch.insert(accountDao.table, accountDao.toMap(Account(categoryId: 1, title: "title$i", name: "name$i", password: "pass$i")));
       }
       for(int i = 0; i < 10; ++ i) {
-        batch.insert(Category.table, Category(name: "test$i").toMap());
+        batch.insert(categoryDao.table, categoryDao.toMap(Category(name: "test$i")));
       }
       await batch.commit();
     });
   }
-
-  Future<int> insert(String table, Map<String, dynamic> data) async {
-    return await (await db).insert(table, data);
-  }
-  Future<int> update(String table, Map<String, dynamic> data, String where, List<dynamic> whereArgs) async {
-    return await (await db).update(table, data, where: where, whereArgs: whereArgs);
-  }
-
-  Future<int> delete(String table, String where, List<dynamic> whereArgs) async {
-    return await (await db).delete(table, where: where, whereArgs: whereArgs);
-  }
-
-  Future insertAll(String table, List<Map<String, dynamic>> data) async {
-    return (await db).transaction((t) async {
-      var batch = t.batch();
-      for(var record in data) {
-        batch.insert(table, record);
-      }
-      await batch.commit();
-    });
-  }
-
-  Future<List<Map<String, dynamic>>> query(String table, {int limit, int offset}) async {
-    return await (await db).query(table,
-      limit: limit,
-      offset: offset);
-  }
-
-  // Future<List<Account>> getAccount({int limit, int offset}) async {
-  //   List<Account> accounts = [];
-  //   List<Map<String, dynamic>> data = await (await db).query(Account.table,
-  //     where: "deleted_at is null",
-  //     limit: limit,
-  //     offset: offset,);
-  //   for(var record in data) {
-  //     accounts.add(Account.fromMap(record));
-  //   }
-  //   return accounts;
-  // }
 
   Future<List<AccountView>> getAccountView({int limit, int offset}) async {
-    List<AccountView> accounts = [];
-    List<Map<String, dynamic>> data = await (await db).query(AccountView.table,
-      where: "deleted_at is null",
+    return accountViewDao.fromList(await (await db).query(
+      accountViewDao.table,
+      where: "${accountDao.columnDeletedAt} is null",
       limit: limit,
-      offset: offset,);
-    for(var record in data) {
-      accounts.add(AccountView.fromMap(record));
-    }
-    return accounts;
+      offset: offset,)
+    );
   }
 
   Future deleteAccount(Account account, {bool isLogical = false}) async {
     if(isLogical) {
       account.deletedAt = DateTime.now().millisecond;
-      await (await db).update(Account.table, account.toMap(), where: 'id == ?', whereArgs: [account.id]);
+      await (await db).update(
+        accountDao.table,
+        accountDao.toMap(account),
+        where: "${accountDao.columnId} == ?",
+        whereArgs: [account.id],
+      );
     } else {
-      await (await db).delete(Account.table, where: 'id == ?', whereArgs: [account.id]);
+      await (await db).delete(
+        accountDao.table,
+        where: "${accountDao.columnId} == ?",
+        whereArgs: [account.id],
+      );
     }
   }
 }

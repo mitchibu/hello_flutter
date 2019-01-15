@@ -72,7 +72,29 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         title: Text('Flutter Demo Home Page'),
       ),
       drawer: SafeArea(
-        child: Drawer(),
+        child: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Text('Drawer Header'),
+                decoration: BoxDecoration(color: Colors.blue),
+              ),
+              ListTile(
+                title: Text('Item1'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('Item2'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
       ),
       body: _buildBody(context),
       floatingActionButton: AnimatedOpacity(
@@ -129,12 +151,12 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
     );
   }
 
-  Widget _buildRow(BuildContext context, AccountView account, int position) {
+  Widget _buildRow(BuildContext context, AccountView accountView, int position) {
     return Dismissible(
-      key: Key(account.account.name),
+      key: Key(accountView.account.name),
       onDismissed: (direction) {
         setState(() {
-          _db.deleteAccount(account.account, isLogical: true);
+          _db.deleteAccount(accountView.account, isLogical: true);
           _data.remove(position);
         });
         // _db.deleteAccount(account, isLogical: true);
@@ -163,11 +185,11 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         color: Colors.red,
         child: Icon(Icons.delete),
       ),
-      child: _buildListTile(account),
+      child: _buildListTile(accountView),
     );
   }
 
-  Widget _buildListTile(AccountView account) {
+  Widget _buildListTile(AccountView accountView) {
     return ListTile(
       title: Container(
         child: Column(
@@ -175,15 +197,15 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
-              account.category.name,
+              accountView.category.name,
               style: const TextStyle(fontSize: 14.0),
             ),
             Text(
-              account.account.title,
+              accountView.account.title,
               style: const TextStyle(fontSize: 18.0),
             ),
             Text(
-              account.account.name,
+              accountView.account.name,
               style: const TextStyle(fontSize: 16.0),
             ),
           ],
@@ -194,7 +216,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         //Navigator.push(context, CupertinoPageRoute(builder: (context) => DetailWidget(account: account)));
         //Navigator.push(context, SlideTransitionRoute(builder: (context) => DetailWidget(account: account)));
         //Navigator.of(context).push(SlideLeftRoute2(enterWidget: DetailWidget(account: account), exitWidget: widget));
-        _showDetail(account);
+        _showDetail(accountView);
         /*Navigator.of(context).push(PageRouteBuilder(
           opaque: false,
           transitionDuration: const Duration(milliseconds: 1000),
@@ -218,9 +240,9 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
     );
   }
 
-  void _showDetail(AccountView account) async {
+  void _showDetail(AccountView accountView) async {
     print("before");
-    final result = await Navigator.of(context).push(PageTransition(type: PageTransitionType.rightToLeftWithFade, child: DetailWidget(account: account)));
+    final result = await Navigator.of(context).push(PageTransition(type: PageTransitionType.rightToLeftWithFade, child: DetailWidget(accountView: accountView)));
     print("after$result");
   }
 }
