@@ -4,9 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:hello_flutter/db/model/account_view.dart';
 import 'package:hello_flutter/localizations.dart';
 
-import '../../db/model/account.dart';
 import '../detail/main.dart';
-import '../../transitions.dart';
 import '../../db/database.dart';
 import '../widget/pagedlistview.dart';
 
