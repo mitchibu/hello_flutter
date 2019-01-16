@@ -61,6 +61,14 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<Category>> getCategories({int limit, int offset}) async {
+    return categoryDao.fromList(await (await db).query(
+      categoryDao.table,
+      limit: limit,
+      offset: offset,)
+    );
+  }
+
   Future<List<AccountView>> getAccountView({int limit, int offset}) async {
     return accountViewDao.fromList(await (await db).query(
       accountViewDao.table,

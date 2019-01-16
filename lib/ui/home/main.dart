@@ -162,6 +162,7 @@ class _HomeWidgetState extends State<HomeWidget> /*with WidgetsBindingObserver*/
         // _db.deleteAccount(account, isLogical: true);
         final snackBar = SnackBar(
           content: Text(MyLocalizations.of(context).$('message_delete')),
+          duration: const Duration(milliseconds: 8000),
           action: SnackBarAction(
             label: MyLocalizations.of(context).$('undo'),
             onPressed: () {
