@@ -1,5 +1,4 @@
 import 'package:hello_flutter/db/database.dart';
-import 'package:hello_flutter/db/model/account.dart';
 import 'package:hello_flutter/db/model/account_view.dart';
 import 'package:hello_flutter/db/model/category.dart';
 import 'package:flutter/material.dart';
