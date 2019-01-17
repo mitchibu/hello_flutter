@@ -90,6 +90,10 @@ class PagedListAdapter<T> {
     entries.removeAt(position);
   }
 
+  void insert(int position, T entry) {
+    entries.insert(position, entry);
+  }
+
   void reload() {
     entries.clear();
     _load(0, entries.length);

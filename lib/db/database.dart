@@ -78,6 +78,16 @@ class DatabaseHelper {
     );
   }
 
+  Future cancelDeleteAccount(Account account) async {
+    account.deletedAt = null;
+    await (await db).update(
+      accountDao.table,
+      accountDao.toMap(account),
+      where: "${accountDao.columnId} == ? and ${accountDao.columnDeletedAt} is not null",
+      whereArgs: [account.id],
+    );
+  }
+
   Future deleteAccount(Account account, {bool isLogical = false}) async {
     if(isLogical) {
       account.deletedAt = DateTime.now().millisecond;

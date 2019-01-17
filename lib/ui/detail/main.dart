@@ -3,6 +3,7 @@ import 'package:hello_flutter/db/model/account.dart';
 import 'package:hello_flutter/db/model/account_view.dart';
 import 'package:hello_flutter/db/model/category.dart';
 import 'package:flutter/material.dart';
+import 'package:hello_flutter/localizations.dart';
 import 'package:hello_flutter/ui/widget/pagedlistview.dart';
 
 class DetailWidget extends StatefulWidget {
@@ -83,13 +84,13 @@ class _DetailWidgetState extends State<DetailWidget> {
       padding: const EdgeInsets.all(16.0),
       children: <Widget>[
         _createEntry(
-          'title',
+          MyLocalizations.of(context).$('title'),
           _titleController
         ),
         Padding(
           padding: EdgeInsets.only(top: 24.0),
           child: _createEntry(
-            'category',
+            MyLocalizations.of(context).$('category'),
             _categoryController,
             suffixIcon: IconButton(
               icon: Icon(Icons.category),
@@ -127,14 +128,14 @@ class _DetailWidgetState extends State<DetailWidget> {
         Padding(
           padding: EdgeInsets.only(top: 24.0),
           child: _createEntry(
-            'name',
+            MyLocalizations.of(context).$('name'),
             _nameController,
           ),
         ),
         Padding(
           padding: EdgeInsets.only(top: 24.0),
           child: _createEntry(
-            'password',
+            MyLocalizations.of(context).$('password'),
             _passwordController,
             obscureText: !visiblePassword,
             suffixIcon: IconButton(
@@ -150,7 +151,7 @@ class _DetailWidgetState extends State<DetailWidget> {
         Padding(
           padding: EdgeInsets.only(top: 24.0),
           child: _createEntry(
-            'comment',
+            MyLocalizations.of(context).$('comment'),
             _commentController,
             keyboardType: TextInputType.multiline,
           ),
@@ -355,5 +356,14 @@ class _DetailWidgetState extends State<DetailWidget> {
       borderRadius: BorderRadius.circular(24.0),
       borderSide: BorderSide.none,
     );
+  }
+
+  void save() {
+    // int count = await db.rawQuery("select count(*) FROM category where name = ?") _categoryController.text;
+    /*
+    if(count == 0) {
+      await db.insert('category', categoryDao.toMap(category));
+    }
+    */
   }
 }

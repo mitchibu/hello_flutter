@@ -1,5 +1,11 @@
 {
 	"app_name": "Hello Flutter",
 	"message_delete": "Deleted",
-	"undo": "Undo"
+	"undo": "Undo",
+
+	"title": "Title",
+	"category": "Category",
+	"name": "Name",
+	"password": "Passsword",
+	"comment": "Comment"
 }
