@@ -8,13 +8,8 @@ import 'package:hello_flutter/ui/widget/pagedlistview.dart';
 
 class DetailWidget extends StatefulWidget {
   final AccountView accountView;
-  Account _account;
-  Category _category;
 
-  DetailWidget({Key key, this.accountView}) : super(key: key) {
-    _account = accountView == null ? Account(title: '', name: '',) : accountView.account;
-    _category = accountView == null ? Category(name: '',) : accountView.category;
-  }
+  DetailWidget({Key key, this.accountView}) : super(key: key);
 
   @override
   _DetailWidgetState createState() => _DetailWidgetState(accountView);
@@ -50,8 +45,6 @@ class _DetailWidgetState extends State<DetailWidget> {
       pageFuture: (int startPosition, int pageSize) => _db.getCategories(limit: pageSize, offset: startPosition),
       pageSize: 10,
     );
-//    WidgetsBinding.instance.addObserver(this);
-    // _load();
   }
 
   @override
@@ -81,235 +74,68 @@ class _DetailWidgetState extends State<DetailWidget> {
 
   Widget _buildBody(BuildContext context, BoxConstraints constraints) {
     return ListView(
-      padding: const EdgeInsets.all(16.0),
       children: <Widget>[
         _createEntry(
           MyLocalizations.of(context).$('title'),
           _titleController
         ),
-        Padding(
-          padding: EdgeInsets.only(top: 24.0),
-          child: _createEntry(
-            MyLocalizations.of(context).$('category'),
-            _categoryController,
-            suffixIcon: IconButton(
-              icon: Icon(Icons.category),
-              onPressed: () {
-                showBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return Container(
-                      height: constraints.maxHeight / 3,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0.0),
-                        itemCount: _data.getCount(),
-                        itemBuilder: (context, position) {
-                          return ListTile(
-                            title: Text(_data.getAt(position).name),
-                            onTap: () {
-                              Navigator.pop(context);
-                              setState(() {
-                                _categoryController.text = _data.getAt(position).name;
-                                //_categoryController.value = _data.getAt(position);
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  },
-                );
-                // setState(() {
-                // });
-              },
-            )
-          ),
+        _createEntry(
+          MyLocalizations.of(context).$('category'),
+          _categoryController,
+          suffixIcon: IconButton(
+            icon: Icon(Icons.category),
+            onPressed: () {
+              showBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Container(
+                    padding: EdgeInsets.only(top: 50.0),
+                    height: constraints.maxHeight / 3,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 0.0),
+                      itemCount: _data.getCount(),
+                      itemBuilder: (context, position) {
+                        return ListTile(
+                          title: Text(_data.getAt(position).name),
+                          onTap: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              _categoryController.text = _data.getAt(position).name;
+                              //_categoryController.value = _data.getAt(position);
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          )
         ),
-        Padding(
-          padding: EdgeInsets.only(top: 24.0),
-          child: _createEntry(
-            MyLocalizations.of(context).$('name'),
-            _nameController,
-          ),
+        _createEntry(
+          MyLocalizations.of(context).$('name'),
+          _nameController,
         ),
-        Padding(
-          padding: EdgeInsets.only(top: 24.0),
-          child: _createEntry(
-            MyLocalizations.of(context).$('password'),
-            _passwordController,
-            obscureText: !visiblePassword,
-            suffixIcon: IconButton(
-              icon: Icon(visiblePassword ? Icons.visibility : Icons.visibility_off),
-              onPressed: () {
-                setState(() {
-                  visiblePassword = !visiblePassword;
-                });
-              },
-            )
-          ),
+        _createEntry(
+          MyLocalizations.of(context).$('password'),
+          _passwordController,
+          obscureText: !visiblePassword,
+          suffixIcon: IconButton(
+            icon: Icon(visiblePassword ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                visiblePassword = !visiblePassword;
+              });
+            },
+          )
         ),
-        Padding(
-          padding: EdgeInsets.only(top: 24.0),
-          child: _createEntry(
-            MyLocalizations.of(context).$('comment'),
-            _commentController,
-            keyboardType: TextInputType.multiline,
-          ),
+        _createEntry(
+          MyLocalizations.of(context).$('comment'),
+          _commentController,
+          keyboardType: TextInputType.multiline,
         ),
       ],
-    );
-  }
-  Widget _buildBody3() {
-    return LayoutBuilder(
-      builder: (context, viewportConstraints) {
-        if(viewportConstraints.hasBoundedHeight) {
-          viewportConstraints = viewportConstraints.copyWith(maxHeight: viewportConstraints.maxHeight + MediaQuery.of(context).viewInsets.vertical);
-        }
-        return SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: ConstrainedBox(
-            constraints: viewportConstraints,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextFormField(
-                  //widget._account.title,
-                  //style: const TextStyle(fontSize: 18.0),
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    border: _createInputBorder(),
-                    labelText: 'title',
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 24.0),
-                ),
-                TextFormField(
-                  //widget._account.title,
-                  //style: const TextStyle(fontSize: 18.0),
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    border: _createInputBorder(),
-                    labelText: 'name',
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 24.0),
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: !visiblePassword,
-                  decoration: InputDecoration(
-                    border: _createInputBorder(),
-                    labelText: 'password',
-                    suffixIcon: IconButton(
-                      icon: Icon(visiblePassword ? Icons.visibility : Icons.visibility_off),
-                      onPressed: () {
-                        setState(() {
-                          visiblePassword = !visiblePassword;
-                        });
-                      },
-                    )
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 24.0),
-                ),
-                Expanded(
-                  child: Container(
-                    child: TextFormField(
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      controller: _commentController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.cyan,
-                        filled: true,
-                        border: _createInputBorder(),
-                        labelText: 'comment',
-                      ),
-                    ),
-                  ),
-                ),
-//                Expanded(
-                  /*child:*/ Text('buttom'),
-//                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-  Widget _buildBody2() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextFormField(
-              //widget._account.title,
-              //style: const TextStyle(fontSize: 18.0),
-              controller: _titleController,
-              decoration: InputDecoration(
-                border: _createInputBorder(),
-                labelText: 'title',
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 24.0),
-            ),
-            TextFormField(
-              //widget._account.title,
-              //style: const TextStyle(fontSize: 18.0),
-              controller: _nameController,
-              decoration: InputDecoration(
-                border: _createInputBorder(),
-                labelText: 'name',
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 24.0),
-            ),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: !visiblePassword,
-              decoration: InputDecoration(
-                border: _createInputBorder(),
-                labelText: 'password',
-                suffixIcon: IconButton(
-                  icon: Icon(visiblePassword ? Icons.visibility : Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      visiblePassword = !visiblePassword;
-                    });
-                  },
-                )
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 24.0),
-            ),
-            Expanded(
-              child: Container(
-                child: TextFormField(
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 5,
-                  controller: _commentController,
-                  decoration: InputDecoration(
-                    fillColor: Colors.cyan,
-                    border: _createInputBorder(),
-                    labelText: 'comment',
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -321,40 +147,25 @@ class _DetailWidgetState extends State<DetailWidget> {
       bool obscureText = false,
       Widget suffixIcon
     }) {
-    const double radius = 24.0;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: radius / 2),
-          child: Text(label),
-        ),
-        TextFormField(
-          keyboardType: keyboardType,
-          obscureText: obscureText,
-          controller: controller,
-          maxLines: keyboardType == TextInputType.multiline ? null : 1,
-          decoration: InputDecoration(
-            fillColor: Colors.cyan,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(radius),
-              borderSide: BorderSide.none,
-            ),
-            hasFloatingPlaceholder: false,
-            labelText: label,
-            suffixIcon: suffixIcon,
+    return ListTile(
+      title: Text(label),
+      subtitle: TextFormField(
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        controller: controller,
+        maxLines: keyboardType == TextInputType.multiline ? null : 1,
+        decoration: InputDecoration(
+          fillColor: Colors.cyan,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide.none,
           ),
+          hasFloatingPlaceholder: false,
+          labelText: label,
+          suffixIcon: suffixIcon,
         ),
-      ]
-    );
-  }
-  InputBorder _createInputBorder() {
-//    return InputBorder.none;
-    return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(24.0),
-      borderSide: BorderSide.none,
+      ),
     );
   }
 
